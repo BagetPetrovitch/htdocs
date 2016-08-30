@@ -94,7 +94,7 @@ function getFlashVersion() //Куда ж без него?
 			if (plugin.name.indexOf('Flash') > -1) version = /\d+/.exec(plugin.description);
 		}
 	}
-	return version[0]; 
+	return version; 
 }
 
 
