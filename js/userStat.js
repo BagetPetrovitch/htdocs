@@ -10,16 +10,17 @@ var userStat = {
 	screenResol: null,
 	innerResol: null,
 	screenAvai: null,
-	connectTiming: null,
-//	domStartTime: null,
-//	domReadyTime: null,
-//	domCompleteTime: null,
-	domTiming: null,
-//	scriptsTiming: null,
-//	statScriptTime: null,
-	onloadStartTime: null,
-//	onloadEndTime: null,
-	onloadTiming: null //Применить jQuery или костыль.
+	statTiming: {
+		connectStart: null,
+		connectEnd: null,
+		domStart: null,
+		domReady: null,
+		domComplete: null,
+		scriptsStart: null,
+		scriptsComplete: null,
+		onloadStart: null,
+		onloadComplete: null  //Применить jQuery или костыль.
+	}
 };
 
 function getBrowser()
@@ -43,29 +44,31 @@ function pageMarking() //Запилить букмарки на срипты.
 
 function pageTiming() //В ms. 
 {
-	if (window.performance && window.performance.timing) //Не веган.
+	if (window.performance && window.performance.timing && document.addEventListener) //Не веган.
 //	if (document.addEventListener)
 	{
 		try
 		{
 			var apiTiming = window.performance.timing; 
-			userStat.startTime = Date(apiTiming.navigationStart);
+			userStat.startTime = apiTiming.navigationStart;
 			
 			//Соединене.
-			userStat.connectTiming = apiTiming.connectEnd - apiTiming.connectStart;
+			userStat.statTiming.connectStart = apiTiming.connectStart;
+			userStat.statTiming.connectEnd = apiTiming.connectEnd;
 			
 			//Все для Дома. 
-//			userStat.domStartTime = apiTiming.domLoading - apiTiming.domComplete;
-//			userStat.domReadyTime = apiTiming.domInteractive - apiTiming.domComplete;
-//			userStat.domCompleteTime = apiTiming.domComplete - apiTiming.navigationStart;
-			userStat.domTiming = apiTiming.domComplete - apiTiming.domLoading;
+			userStat.statTiming.domStart = apiTiming.domLoading;
+			userStat.statTiming.domReady = apiTiming.domInteractive;
+			userStat.statTiming.domComplete = apiTiming.domComplete;
+//			userStat.statTiming.domTiming = apiTiming.domComplete - apiTiming.domLoading;
 			
-//			userStat.scriptsTiming = ;
+//			userStat.statTiming.scriptsStart = ;
+//			userStat.statTiming.scriptsComplete = ;
 			
-			//Все, что после дома.
-			userStat.onloadStartTime = apiTiming.loadEventStart - apiTiming.navigationStart;
-//			userStat.onloadEndTime = userStat.loadEventEnd - apiTiming.navigationStart;
-			userStat.onloadTiming = apiTiming.loadEventStart - userStat.loadEventEnd;
+			//Все, после дома.
+			userStat.statTiming.onloadStart = apiTiming.loadEventStart;
+			userStat.statTiming.onloadComplete = userStat.loadEventEnd;
+//			userStat.statTiming.onloadTiming = apiTiming.loadEventStart - userStat.loadEventEnd;
 		}
 		catch(err){};
 	}
@@ -93,8 +96,8 @@ function getFlashVersion() //Куда ж без него?
 			if (plugin.name == undefined) continue;
 			if (plugin.name.indexOf('Flash') > -1) version = /\d+/.exec(plugin.description);
 		}
+		return version[0]; 
 	}
-	return version; 
 }
 
 
@@ -122,14 +125,14 @@ function sendStat() //Пакуем, отправляем.
 	stat.timeout = 3000;
 	stat.send(JSON.stringify(userStat));
 	
-	stat.onreadystatechange = function() 
+		stat.onreadystatechange = function() 
 	{
 		if ((stat.readyState == 4) && (stat.status !== 200))
 		{
+			
 			//to Local Storage. 
 		}
 	}
-
 }
 
 function statEnd() //Стартуем.
