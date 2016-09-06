@@ -22,18 +22,6 @@
 		fclose($file);
 	};
 
-/*	function getTimeRange($eventTime, $startTime) 
-	{
-		if (($eventTime != null) && ($startTime != null))
-		{
-			return $eventTime - $startTime != null;
-		}
-		else
-		{
-			return null;
-		}
-	};
-*/
 	function statPreparing($statArr)
 	{
 		if ($statArr["startTime"] != null)
@@ -47,11 +35,9 @@
 						if ($val2 != null)
 						{
 							$val[$key2] = $val2 - $statArr["startTime"];
-							echo ($val[$key2] . ' | ');
 						}
 					}
-				}
-				
+				}	
 			}
 		}
 		return $statArr;

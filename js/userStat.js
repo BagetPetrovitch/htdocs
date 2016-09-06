@@ -19,7 +19,7 @@ var userStat = {
 		scriptsStart: null,
 		scriptsComplete: null,
 		onloadStart: null,
-		onloadComplete: null  //Применить jQuery или костыль.
+//		onloadComplete: null  
 	}
 };
 
@@ -59,16 +59,14 @@ function pageTiming() //В ms.
 			//Все для Дома. 
 			userStat.statTiming.domStart = apiTiming.domLoading;
 			userStat.statTiming.domReady = apiTiming.domInteractive;
-			userStat.statTiming.domComplete = apiTiming.domComplete;
-//			userStat.statTiming.domTiming = apiTiming.domComplete - apiTiming.domLoading;
+			userStat.statTiming.domComplete = apiTiming.domComplete;			
 			
 //			userStat.statTiming.scriptsStart = ;
 //			userStat.statTiming.scriptsComplete = ;
 			
 			//Все, после дома.
 			userStat.statTiming.onloadStart = apiTiming.loadEventStart;
-			userStat.statTiming.onloadComplete = userStat.loadEventEnd;
-//			userStat.statTiming.onloadTiming = apiTiming.loadEventStart - userStat.loadEventEnd;
+//			userStat.statTiming.onloadComplete = userStat.loadEventEnd;
 		}
 		catch(err){};
 	}
@@ -94,10 +92,20 @@ function getFlashVersion() //Куда ж без него?
 		{
 			plugin = navigator.plugins[i];
 			if (plugin.name == undefined) continue;
-			if (plugin.name.indexOf('Flash') > -1) version = /\d+/.exec(plugin.description);
+			if (plugin.name.indexOf('Flash') > -1)  
+			{
+				if (plugin.version != null)
+				{
+					version = plugin.version;
+				}
+				else
+				{
+					version = plugin.description;
+				}
+			}
 		}
-		return version[0]; 
 	}
+	return version;
 }
 
 
@@ -125,11 +133,10 @@ function sendStat() //Пакуем, отправляем.
 	stat.timeout = 3000;
 	stat.send(JSON.stringify(userStat));
 	
-		stat.onreadystatechange = function() 
+	stat.onreadystatechange = function() 
 	{
 		if ((stat.readyState == 4) && (stat.status !== 200))
 		{
-			
 			//to Local Storage. 
 		}
 	}
@@ -145,8 +152,10 @@ function statEnd() //Стартуем.
 	if (document.addEventListener)
 	{
 		window.removeEventListener("load", statEnd);
-	}
+	}	
 }
+
+//window.onload = statEnd();
 
 if (!document.addEventListener)
 {
@@ -156,6 +165,3 @@ else
 {
 	window.addEventListener("load", statEnd);
 }
-
-//window.addEventListener("load", statEnd);
-//window.onload = statEnd();
